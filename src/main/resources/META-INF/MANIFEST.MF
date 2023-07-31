@@ -1,0 +1,2 @@
+Main-Class: mikhail.shell.gleamy.GleamyApplication
+Start-Class: mikhail.shell.gleamy.GleamyApplication
