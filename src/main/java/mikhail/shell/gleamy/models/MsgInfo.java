@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-@Getter @Setter 
-public class User {
-    private long id;
-    private String login, password, email;
+@Getter @Setter
+public class MsgInfo {
+    private long id, chatid, userid;
+    private String text;
 }

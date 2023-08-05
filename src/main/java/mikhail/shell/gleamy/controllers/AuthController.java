@@ -26,13 +26,38 @@ public class AuthController {
             @RequestParam("password") String password)
     {
         String code;
-        User user = uDAO.getUser(login);
+        User user = uDAO.getUser(login, "login");
         if (user == null)
             code = "NOTFOUND";
         else if (!user.getPassword().equals(password))
             code = "PASSINCORRECT";
         else
             code =  "OK";
+        return code;
+    }
+    @GetMapping("/signup")
+    public String signup (@RequestParam("login")String login,
+            @RequestParam("password") String password,
+            @RequestParam("login") String email)
+    {
+        String code;
+        if (uDAO.getUser(login, "login") != null)
+        {
+            code = "NICKEXISTS";
+        }
+        else if (uDAO.getUser(email, "email") != null)
+        {
+            code = "EMAILEXISTS";
+        }
+        else
+        {
+            User user = new User();
+            user.setLogin(login);
+            user.setPassword(password);
+            user.setEmail(email);
+            uDAO.insertUser(user);
+            code = "OK";
+        }
         return code;
     }
 }

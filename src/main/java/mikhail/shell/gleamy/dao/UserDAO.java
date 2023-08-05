@@ -11,26 +11,40 @@ import mikhail.shell.gleamy.models.User;
 
 @Component 
 @Scope("singleton")
-public class UserDAO {
-    private ApplicationContext appContext;
-    private JdbcTemplate jdbc;
+public class UserDAO extends AbstractDAO {
     @Autowired
     public UserDAO(ApplicationContext appContext, 
             JdbcTemplate jdbc)
     {
-        this.appContext = appContext;
-        this.jdbc = jdbc;
+        super(appContext, jdbc);
     }
-    public User getUser(String login) 
+    public User getUser(String key, String by) 
     {
-        List<User> users = jdbc.query(
-                "SELECT `id`, `login`,`password` FROM `users`"
-                        + "WHERE `login` = ?", 
-                new String[] {login},
+        String sql;
+        if (by.equals("login"))
+        {
+            sql = "SELECT `id`, `login`,`password`, `email` FROM `users`"
+                        + "WHERE `login` = ?";
+        }
+        else 
+        {
+            sql  = "SELECT `id`, `login`,`password`, `email` FROM `users`"
+                        + "WHERE `email` = ?";
+        }
+        List<User> users = jdbc.query(sql,
+                new String[] {key},
                 new BeanPropertyRowMapper<>(User.class));
         if (!users.isEmpty())
             return users.get(0);
         else
             return null;
+    }
+    public boolean insertUser(User user)
+    {
+        return jdbc.update("INSERT INTO `users` (`login`, `password`, `email`)"
+                + "VALUES (?, ?, ?)", 
+                new String [] {user.getLogin(), 
+                user.getPassword(), 
+                user.getEmail()}) == 1; 
     }
 }
