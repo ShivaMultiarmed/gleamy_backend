@@ -1,5 +1,9 @@
 package mikhail.shell.gleamy.service;
 
+import java.util.Map;
+import java.util.HashMap;
+
+import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -8,18 +12,40 @@ import org.springframework.stereotype.Service;
 import lombok.Getter;
 import lombok.Setter;
 
+import mikhail.shell.gleamy.dao.AbstractDAO;
+import mikhail.shell.gleamy.dao.ChatDAO;
 import mikhail.shell.gleamy.models.MsgInfo;
 
 @Service
 @Getter @Setter
 public class MessageService {
+	 
+	private final ApplicationContext appContext;
+	private final JmsTemplate jmsTpl;
+	private final SimpMessagingTemplate simpJms;
+	private final Map<String, AbstractDAO> daos;
 
 	@Autowired
-	private JmsTemplate jmsTpl;
-	//private SimpMessagingTemplate msgTpl;
+	public MessageService(ApplicationContext appContext, JmsTemplate jmsTpl, SimpMessagingTemplate simpJms)
+	{
+		this.appContext = appContext;
+		this.jmsTpl = jmsTpl;
+		this.simpJms = simpJms;
+		daos = new HashMap<>();
+		addDAO("chatDAO",appContext.getBean("chatDAO", ChatDAO.class));
+	}
+	
+	public void addDAO(String name, AbstractDAO dao)
+	{
+		daos.put(name, dao);
+	}
 
 	public void notifyChatMembers(MsgInfo msg) {
-		String topic = "/topics/chats/" + msg.getChatid();
-		msgTpl.convertAndSend(topic, msg);
+		ChatDAO chatDAO = (ChatDAO)daos.get("chatDAO");
+		for (Long userid : chatDAO.getUserIdsFromChat(msg.getChatid()))
+		{
+			simpJms.convertAndSend("/topic/users/" + userid, msg);
+		}
+			
 	}
 }

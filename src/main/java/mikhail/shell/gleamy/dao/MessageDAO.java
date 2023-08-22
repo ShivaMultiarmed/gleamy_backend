@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageDAO extends AbstractDAO {
     @Autowired
-    public MessageDAO(ApplicationContext appContext, 
+    public MessageDAO(ApplicationContext appContext,  
             JdbcTemplate jdbc)
     {
         super(appContext, jdbc);

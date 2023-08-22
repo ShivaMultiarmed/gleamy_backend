@@ -53,7 +53,6 @@ public class MessageController {
     {
 		Map<String, Long> response = new HashMap<>();
 		long msgid = msgDAO.add(msg);
-		System.out.println(msgid);
 		response.put("msgid", msgid);
 		msgService.notifyChatMembers(msg);
         return response;

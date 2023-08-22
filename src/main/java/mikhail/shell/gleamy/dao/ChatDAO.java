@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mikhail.shell.gleamy.dao;
 
 import java.util.List;
@@ -9,6 +5,7 @@ import java.sql.Statement;
 import java.sql.PreparedStatement;
 import lombok.Getter;
 import mikhail.shell.gleamy.models.ChatInfo;
+import mikhail.shell.gleamy.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -76,4 +73,13 @@ public class ChatDAO extends AbstractDAO{
         
         return keyHolder.getKey().longValue();
     }
+	public List<Long> getUserIdsFromChat(long chatid)
+	{
+		return getJdbc().queryForList("SELECT userid FROM users_in_chats WHERE chatid = " + chatid, Long.class);
+	}
+	public List<User> getChatMembers(long chatid)
+	{
+		String sql = "SELECT * FROM `users` INNER JOIN users_in_chats ON `users`.id = `users_in_chats`.`userid` WHERE chatid = ?";
+		return getJdbc().query(sql, new Object[]{chatid}, new BeanPropertyRowMapper(User.class));
+	}
 }
