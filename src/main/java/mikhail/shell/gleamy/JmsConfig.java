@@ -101,13 +101,13 @@ public class JmsConfig implements WebSocketMessageBrokerConfigurer{
 	public void configureMessageBroker(MessageBrokerRegistry registry)
 	{
 		registry.setApplicationDestinationPrefixes("/gleamy");
-		registry.enableSimpleBroker("topic", "queue");
+		registry.enableSimpleBroker("/topic", "/queue");
 		//registry.configureBrokerChannel().brokerService(brokerService());
 	}
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry)
 	{
-		registry.addEndpoint("/websocket");
+		registry.addEndpoint("/websocket").setAllowedOrigins("*");
 	}
 	@Override 
 	public void configureClientInboundChannel(ChannelRegistration registration)

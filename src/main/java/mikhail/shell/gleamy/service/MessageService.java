@@ -17,19 +17,19 @@ import mikhail.shell.gleamy.dao.ChatDAO;
 import mikhail.shell.gleamy.models.MsgInfo;
 
 @Service
-@Getter @Setter
+@Getter
 public class MessageService {
 	 
 	private final ApplicationContext appContext;
-	private final JmsTemplate jmsTpl;
+	//private final JmsTemplate jmsTpl;
 	private final SimpMessagingTemplate simpJms;
 	private final Map<String, AbstractDAO> daos;
 
 	@Autowired
-	public MessageService(ApplicationContext appContext, JmsTemplate jmsTpl, SimpMessagingTemplate simpJms)
+	public MessageService(ApplicationContext appContext, SimpMessagingTemplate simpJms)
 	{
 		this.appContext = appContext;
-		this.jmsTpl = jmsTpl;
+		//this.jmsTpl = jmsTpl;
 		this.simpJms = simpJms;
 		daos = new HashMap<>();
 		addDAO("chatDAO",appContext.getBean("chatDAO", ChatDAO.class));

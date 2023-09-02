@@ -10,14 +10,25 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.TextMessage;
 
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Component;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer
 {
+	private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry)
 	{
-		registry.addHandler(appWebSocketHandler(), "/websocket").setAllowedOrigins("*");
+		registry.addHandler(appWebSocketHandler(), "/gleamy/websocket").setAllowedOrigins("*");
+		//registry.addHandler(appWebSocketHandler(), "/gleamy/websocket").setAllowedOrigins("*");
 	}
 	@Bean
 	public WebSocketHandler appWebSocketHandler()
@@ -26,6 +37,7 @@ public class WebSocketConfig implements WebSocketConfigurer
 			@Override 
 			protected void handleTextMessage(WebSocketSession session, TextMessage msg)
 			{
+				logger.info(msg.toString());
 				try{
 					session.sendMessage(msg);
 				}
