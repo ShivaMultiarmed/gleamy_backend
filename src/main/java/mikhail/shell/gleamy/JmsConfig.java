@@ -20,7 +20,6 @@ import java.lang.Exception;
 import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
 import java.io.File; 
 import java.io.IOException;
-import mikhail.shell.gleamy.service.WebSocketInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -51,7 +50,7 @@ public class JmsConfig implements WebSocketMessageBrokerConfigurer{
 		
 		
 		return bs;
-	}*/
+	}
 	@Bean
 	public BrokerService brokerService() {
 		BrokerService bs = new BrokerService();
@@ -96,7 +95,7 @@ public class JmsConfig implements WebSocketMessageBrokerConfigurer{
 		jms.setConnectionFactory(connectionFactory());
 		return jms;
 	}
-
+	*/
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry)
 	{
@@ -109,10 +108,11 @@ public class JmsConfig implements WebSocketMessageBrokerConfigurer{
 	{
 		registry.addEndpoint("/websocket").setAllowedOrigins("*");
 	}
+	/*
 	@Override 
 	public void configureClientInboundChannel(ChannelRegistration registration)
 	{
 		registration.interceptors(new WebSocketInterceptor());
 	}
-	
+	*/
 }

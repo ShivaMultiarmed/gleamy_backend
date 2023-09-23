@@ -81,5 +81,5 @@ public class ChatDAO extends AbstractDAO{
 	{
 		String sql = "SELECT * FROM `users` INNER JOIN users_in_chats ON `users`.id = `users_in_chats`.`userid` WHERE chatid = ?";
 		return getJdbc().query(sql, new Object[]{chatid}, new BeanPropertyRowMapper(User.class));
-	}
+	} 
 }

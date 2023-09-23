@@ -12,6 +12,6 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Getter @Setter
 public class MsgInfo implements Serializable {
-    private long id, chatid, userid;
+    private long msgid, chatid, userid;
     private String text;
 }

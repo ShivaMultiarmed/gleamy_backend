@@ -39,13 +39,10 @@ public class MessageController {
     }
     @GetMapping("/chat/{chatid}")
 	@ResponseBody
-    public Map<Long, MsgInfo> getChatMsgs(@PathVariable("chatid") long id)
+    public List<MsgInfo> getChatMsgs(@PathVariable("chatid") long id)
     {
         List<MsgInfo> msgs = msgDAO.getChatMsgs(id);
-		Map<Long, MsgInfo> msgInfos = new HashMap<Long, MsgInfo>();
-		for (MsgInfo msg: msgs)
-			msgInfos.put(msg.getId(), msg);
-        return msgInfos;
+        return msgs;
     }
     @PostMapping("/add")
     @ResponseBody
@@ -53,6 +50,7 @@ public class MessageController {
     {
 		Map<String, Long> response = new HashMap<>();
 		long msgid = msgDAO.add(msg);
+		msg.setMsgid(msgid);
 		response.put("msgid", msgid);
 		msgService.notifyChatMembers(msg);
         return response;

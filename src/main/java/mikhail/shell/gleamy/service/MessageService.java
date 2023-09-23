@@ -15,10 +15,11 @@ import lombok.Setter;
 import mikhail.shell.gleamy.dao.AbstractDAO;
 import mikhail.shell.gleamy.dao.ChatDAO;
 import mikhail.shell.gleamy.models.MsgInfo;
+import mikhail.shell.gleamy.api.StompWrapper;
 
 @Service
 @Getter
-public class MessageService {
+public final class MessageService {
 	 
 	private final ApplicationContext appContext;
 	//private final JmsTemplate jmsTpl;
@@ -44,7 +45,7 @@ public class MessageService {
 		ChatDAO chatDAO = (ChatDAO)daos.get("chatDAO");
 		for (Long userid : chatDAO.getUserIdsFromChat(msg.getChatid()))
 		{
-			simpJms.convertAndSend("/topic/users/" + userid, msg);
+			simpJms.convertAndSend("/topic/users/" + userid, new StompWrapper("RECEIVEDMESSAGE",msg));
 		}
 			
 	}

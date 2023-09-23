@@ -43,6 +43,29 @@ public class MessageDAO extends AbstractDAO {
                                     );
         return msgs;
     }
+	public List<MsgInfo> getLastMsgs(long userid) 
+	{
+		String sql = "SELECT `messages`.`chatid`, `messages`.`userid`, `messages`.text, messages.msgid FROM messages WHERE msgid IN (SELECT MAX(messages.msgid) FROM messages INNER JOIN `users_in_chats` ON `users_in_chats`.`chatid` = `messages`.`chatid`  WHERE `users_in_chats`.`userid` = ? GROUP BY `messages`.`chatid`) ;";
+		List<MsgInfo> msgs = getJdbc().query(
+			sql,
+			new Object[]{userid},
+			new BeanPropertyRowMapper(MsgInfo.class)
+		);
+		return msgs;
+	}
+	public MsgInfo getLastMsg(long chatid)
+	{
+		String sql = "SELECT * FROM `messages` WHERE `chatid` = ? ORDER BY `id` DESC LIMIT 0,1;";
+		List<MsgInfo> msgs = getJdbc().query(
+			sql,
+			new Object[] {chatid},
+			new BeanPropertyRowMapper(MsgInfo.class)
+		);
+		if (msgs.isEmpty())
+			return null;
+		else	
+			return msgs.get(0);
+	}
     public long add(MsgInfo msg) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		
@@ -72,7 +95,7 @@ public class MessageDAO extends AbstractDAO {
                         + "WHERE id = ?;", 
                         new Object[]{
                                         msg.getText(),
-                                        msg.getId()
+                                        msg.getMsgid()
                                     }
                         ) >0);
     }

@@ -25,7 +25,7 @@ public class AuthController {
         this.uDAO = uDAO;
     }
     
-    @GetMapping("/login")
+    @PostMapping("/login")
     @ResponseBody
     public Map<String,String> login(@RequestParam("login")String login,
             @RequestParam("password") String password)
