@@ -1,16 +1,24 @@
 package mikhail.shell.gleamy.models;
 
-import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import java.io.Serializable;
+import java.util.Map;
+
+import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component 
 @Scope("prototype")
-@Getter @Setter 
-public class ChatInfo {
+@Data
+@Entity
+@Table(name = "chats")
+public class ChatInfo implements Serializable{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
-    private List<Long> users;
+	private Message last;
+    @OneToMany
+    private Map<Long, User> users;
 }

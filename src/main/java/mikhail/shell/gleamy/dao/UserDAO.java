@@ -1,12 +1,18 @@
 package mikhail.shell.gleamy.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+
 import mikhail.shell.gleamy.models.User;
 
 @Component 
@@ -39,12 +45,26 @@ public class UserDAO extends AbstractDAO {
         else
             return null;
     }
-    public boolean insertUser(User user)
+    public long insertUser(User user)
     {
-        return jdbc.update("INSERT INTO `users` (`login`, `password`, `email`)"
-                + "VALUES (?, ?, ?)", 
-                new String [] {user.getLogin(), 
-                user.getPassword(), 
-                user.getEmail()}) == 1; 
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		
+        jdbc.update( connection -> {
+				String query = "INSERT INTO `users` (`login`, `password`, `email`)"
+                + "VALUES (?, ?, ?)";
+				PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, user.getLogin());
+				ps.setString(2, user.getPassword());
+				ps.setString(3, user.getEmail());
+				return ps;
+			}, keyHolder
+		);
+		return keyHolder.getKey().longValue();
     }
+	public List<User> search(String query)
+	{
+		String sql = "SELECT * FROM users WHERE login LIKE '%"+query+"%';";
+		List<User> users = jdbc.query(sql, new BeanPropertyRowMapper<>(User.class));
+		return users;
+	}
 }
