@@ -3,8 +3,8 @@ package mikhail.shell.gleamy.dao;
 import java.util.List;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
-import lombok.Getter;
-import mikhail.shell.gleamy.models.ChatInfo;
+
+import mikhail.shell.gleamy.models.Chat;
 import mikhail.shell.gleamy.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -23,30 +23,30 @@ public class ChatDAO extends AbstractDAO{
     {
         super(appContext, jdbc);
     }
-    public List<ChatInfo> getAllChats(long userid)
+    public List<Chat> getAllChats(long userid)
     {
         String sql = "SELECT * FROM `chats` \n" +
                     "INNER JOIN `users_in_chats`\n" +
                     "ON chats.id = users_in_chats.chatid\n" +
                     "WHERE userid = ?;";
-        List<ChatInfo> chats = getJdbc().query(sql,
+        List<Chat> chats = getJdbc().query(sql,
                 new Object[]{userid},
-                new BeanPropertyRowMapper(ChatInfo.class));
+                new BeanPropertyRowMapper(Chat.class));
         return chats;
     }
-    public ChatInfo getChat(long chatid)
+    public Chat getChat(long chatid)
     {
         String sql = "SELECT * FROM `chats` WHERE `id` = ?;";
-        List<ChatInfo> chats = getJdbc().query(sql,
+        List<Chat> chats = getJdbc().query(sql,
                 new Object[]{chatid},
-                new BeanPropertyRowMapper(ChatInfo.class));
+                new BeanPropertyRowMapper(Chat.class));
         if (!chats.isEmpty())
             return chats.get(0);
         else
             return null;
     }
 
-    public long add(ChatInfo chat) {
+    public long add(Chat chat) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
         int addChat = getJdbc().update(
 						connection -> {

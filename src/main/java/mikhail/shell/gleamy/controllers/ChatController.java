@@ -5,19 +5,17 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.AllArgsConstructor;
+import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.ChatsRepo;
 import mikhail.shell.gleamy.repositories.MessagesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import mikhail.shell.gleamy.models.ChatInfo;
+import mikhail.shell.gleamy.models.Chat;
 import mikhail.shell.gleamy.models.Message;
 
 import mikhail.shell.gleamy.dao.ChatDAO;
@@ -26,71 +24,66 @@ import mikhail.shell.gleamy.dao.MessageDAO;
 import mikhail.shell.gleamy.service.ChatService;
 
 @RestController
-@RequestMapping("/chats")
+@RequestMapping("/api/v1/chats")
+@AllArgsConstructor
 public class ChatController {
-    private final ChatDAO chDAO;
-	private final ChatService chatService;
-	private final MessageDAO msgDAO;
-    private final ChatsRepo chatsRepo;
-    private final MessagesRepo messagesRepo;
     @Autowired
-    public ChatController(
-            ChatService chatService,
-            ChatDAO chDAO,
-            MessageDAO msgDAO,
-            ChatsRepo chatsRepo,
-            MessagesRepo messagesRepo)
-    {
-		this.chatService = chatService;
-        this.chDAO = chDAO;
-		this.msgDAO = msgDAO;
-        this.chatsRepo = chatsRepo;
-        this.messagesRepo = messagesRepo;
-    }
+	private final ChatService chatService;
     @GetMapping("/users/{userid}")
-	@ResponseBody
-    public Map<Long,ChatInfo> getAllChats(@PathVariable("userid") long userid)
+    public ResponseEntity<List<Chat>> getAllChats(@PathVariable Long userid)
     {
-        List<ChatInfo> chats = chDAO.getAllChats(userid);
-		List<Message> msgs = msgDAO.getLastMsgs(userid);
-		Map<Long, ChatInfo> chatInfos = new HashMap<Long, ChatInfo>();
-		for (ChatInfo chat : chats)
-		{
-			chatInfos.put(chat.getId(), chat);
-		}
-		for (Message msg : msgs)
-		{
-			chatInfos.get(msg.getChatid()).setLast(msg);
-		}
-		chatInfos = new LinkedHashMap<Long, ChatInfo>(chatInfos);
-        return chatInfos;
+        return ResponseEntity.ok(chatService.getAllChats(userid));
     }
     @GetMapping("/{chatid}")
-    @ResponseBody
-    public ChatInfo getChat(@PathVariable("chatid") long chatid)
+    public ResponseEntity<Chat> getChat(@PathVariable Long chatid)
     {
-        ChatInfo chat = chDAO.getChat(chatid);
-        return chat;
+        if (chatid == null)
+            return ResponseEntity.badRequest().build();
+        Chat chat = chatService.getChat(chatid);
+        return chat != null ? ResponseEntity.ok(chat) : ResponseEntity.notFound().build();
     }
     @PostMapping("/add")
-    public Map<String, String> addChat(@RequestBody ChatInfo chat)
+    public ResponseEntity<Chat> addChat(@RequestBody Chat chat)
     {
-		long chatid = chDAO.add(chat);
-		chat.setId(chatid);
-		Map<String, String> response = new HashMap<>();
-		response.put("chatid", chatid + "");
-        return response;
-    }
-
-    @GetMapping("/{chatid}/members/all")
-    public ResponseEntity<List<Long>> getAllMembersByChatId(@PathVariable long chatid)
-    {
-        if (!chatsRepo.existsById(chatid))
-            return ResponseEntity.notFound().build();
-        else
-        {
-            List<Long> ids = null;//messagesRepo.findAllMembersIdsByChatid(chatid);
-            return ResponseEntity.ok(ids);
+        if (chat == null)
+            return ResponseEntity.badRequest().build();
+        try {
+            return ResponseEntity.ok(chatService.addChat(chat));
         }
+        catch (EntityExistsException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PatchMapping("/{chatid}")
+    public ResponseEntity<Chat> editChat(@RequestBody Chat chat)
+    {
+        if (chat == null)
+            return ResponseEntity.badRequest().build();
+        try {
+            return ResponseEntity.ok(chatService.editChat(chat));
+        }
+        catch (EntityNotFoundException e)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @DeleteMapping("/{chatid}")
+    public ResponseEntity deleteChat(@PathVariable Long chatid)
+    {
+        if (chatid == null)
+            return ResponseEntity.badRequest().build();
+        try{
+            return chatService.removeChat(chatid) ?
+                    ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
+        }catch (EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/{chatid}/members/all")
+    public ResponseEntity<List<User>> getAllChatMembers(@PathVariable Long chatid)
+    {
+        return null;
     }
 }

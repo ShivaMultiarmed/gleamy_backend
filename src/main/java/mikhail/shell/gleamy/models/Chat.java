@@ -1,6 +1,7 @@
 package mikhail.shell.gleamy.models;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.persistence.*;
@@ -13,12 +14,12 @@ import org.springframework.stereotype.Component;
 @Data
 @Entity
 @Table(name = "chats")
-public class ChatInfo implements Serializable{
+public class Chat implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
-	private Message last;
+	//private Message last;
     @OneToMany
-    private Map<Long, User> users;
+    private List<User> users;
 }

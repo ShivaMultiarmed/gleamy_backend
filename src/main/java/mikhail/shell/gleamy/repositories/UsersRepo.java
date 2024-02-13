@@ -9,4 +9,6 @@ public interface UsersRepo extends JpaRepository<User, Long> {
     List<User> findByLoginContaining(String login);
     boolean existsByLogin(String login);
     User getByLogin(String login);
+    //List<User> getAllChatMembers(Long chatid);
+    //List<User> getActiveChatMembers(Long chatid);
 }
