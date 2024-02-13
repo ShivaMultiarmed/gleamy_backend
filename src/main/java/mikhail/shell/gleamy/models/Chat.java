@@ -3,6 +3,7 @@ package mikhail.shell.gleamy.models;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,7 +20,13 @@ public class Chat implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
-	//private Message last;
-    @OneToMany
-    private List<User> users;
+    @Transient
+	private Message last;
+    @ManyToMany
+    @JoinTable(
+            name = "users_in_chats",
+            joinColumns = @JoinColumn(name="chatid"),
+            inverseJoinColumns = @JoinColumn(name="userid")
+    )
+    private Set<User> users;
 }

@@ -62,10 +62,10 @@ public class ChatDAO extends AbstractDAO{
         if (addChat==0)
             return 0;
         String sql = "INSERT INTO `users_in_chats` VALUES ";
-        for(Long uid : chat.getUsers().keySet())
+        /*for(Long uid : chat.getUsers().keySet())
         {
             sql += "('"+ chat.getId()+"','"+uid+"') ,";
-        }
+        }*/
 		sql = sql.substring(0,sql.length()-1) + ";";
         int assignUsers = getJdbc().update(sql);
         if (assignUsers==0)

@@ -1,11 +1,17 @@
 package mikhail.shell.gleamy.repositories;
 
 import mikhail.shell.gleamy.models.Chat;
-import mikhail.shell.gleamy.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface ChatsRepo extends JpaRepository<Chat, Long> {
-    List<Chat> getUserChats(Long userid);
+    @Modifying
+    @Query(nativeQuery = true,
+            value = "SELECT `chats`.* FROM `chats` INNER JOIN `users_in_chats`" +
+                    " ON `chats`.`id` = `users_in_chats`.`chatid` WHERE `users_in_chats`.`userid` = :userid ;")
+    List<Chat> getUserChats(@Param("userid") Long userid);
 }
