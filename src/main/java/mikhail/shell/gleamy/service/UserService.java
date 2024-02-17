@@ -1,12 +1,20 @@
 package mikhail.shell.gleamy.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -26,7 +34,7 @@ public class UserService {
     }
     public User addUser(User user) throws IllegalArgumentException
     {
-        if (usersRepo.existsById(user.getId()) || usersRepo.existsByLogin(user.getLogin()))
+        if (user.getId() != null || usersRepo.existsByLogin(user.getLogin()) || usersRepo.existsByEmail(user.getEmail()))
             throw new IllegalArgumentException();
         else
             return usersRepo.save(user);
@@ -53,5 +61,10 @@ public class UserService {
         else
             return usersRepo.getByLogin(login);
     }
-
+    public File getAvatarByUserId(Long userid)
+    {
+        if (!usersRepo.existsById(userid))
+            throw new EntityNotFoundException();
+        return new File("D:/Java Spring Projects/GleamyMessenger/gleamy/src/main/resources/storage/imgs/avatars/" + usersRepo.getReferenceById(userid).getAvatar());
+    }
 }

@@ -1,41 +1,30 @@
 package mikhail.shell.gleamy.controllers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import mikhail.shell.gleamy.models.Chat;
 import mikhail.shell.gleamy.models.User;
-import mikhail.shell.gleamy.repositories.ChatsRepo;
-import mikhail.shell.gleamy.repositories.MessagesRepo;
+import mikhail.shell.gleamy.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import mikhail.shell.gleamy.models.Chat;
-import mikhail.shell.gleamy.models.Message;
-
-import mikhail.shell.gleamy.dao.ChatDAO;
-import mikhail.shell.gleamy.dao.MessageDAO;
-
-import mikhail.shell.gleamy.service.ChatService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/chats")
 @AllArgsConstructor
-public class ChatController {
+class ChatController {
     @Autowired
 	private final ChatService chatService;
     @GetMapping("/users/{userid}")
-    public ResponseEntity<List<Chat>> getAllChats(@PathVariable Long userid)
+    ResponseEntity<List<Chat>> getAllChats(@PathVariable Long userid)
     {
         return ResponseEntity.ok(chatService.getAllChats(userid));
     }
     @GetMapping("/{chatid}")
-    public ResponseEntity<Chat> getChat(@PathVariable Long chatid)
+    ResponseEntity<Chat> getChat(@PathVariable Long chatid)
     {
         if (chatid == null)
             return ResponseEntity.badRequest().build();
@@ -43,7 +32,7 @@ public class ChatController {
         return chat != null ? ResponseEntity.ok(chat) : ResponseEntity.notFound().build();
     }
     @PostMapping("/add")
-    public ResponseEntity<Chat> addChat(@RequestBody Chat chat)
+    ResponseEntity<Chat> addChat(@RequestBody Chat chat)
     {
         if (chat == null)
             return ResponseEntity.badRequest().build();
@@ -56,7 +45,7 @@ public class ChatController {
         }
     }
     @PatchMapping("/{chatid}")
-    public ResponseEntity<Chat> editChat(@RequestBody Chat chat)
+    ResponseEntity<Chat> editChat(@RequestBody Chat chat)
     {
         if (chat == null)
             return ResponseEntity.badRequest().build();
@@ -69,7 +58,7 @@ public class ChatController {
         }
     }
     @DeleteMapping("/{chatid}")
-    public ResponseEntity deleteChat(@PathVariable Long chatid)
+    ResponseEntity deleteChat(@PathVariable Long chatid)
     {
         if (chatid == null)
             return ResponseEntity.badRequest().build();
@@ -82,7 +71,7 @@ public class ChatController {
         }
     }
     @GetMapping("/{chatid}/members/all")
-    public ResponseEntity<List<User>> getAllChatMembers(@PathVariable Long chatid)
+    ResponseEntity<List<User>> getAllChatMembers(@PathVariable Long chatid)
     {
         return null;
     }

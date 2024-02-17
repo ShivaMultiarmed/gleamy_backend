@@ -9,13 +9,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 @Configuration
 public class AppConfig {
     @Bean
-    public JdbcTemplate jdbc()
-    {
-        JdbcTemplate jdbc = new JdbcTemplate();
-        jdbc.setDataSource(dataSource());
-        return jdbc;
-    }
-    @Bean
     public DataSource dataSource()
     {
 		//System.setProperty("javax.net.ssl.trustStore", "/home/mikhail_shell/.mysql/YATrustStore");

@@ -25,94 +25,17 @@ import java.io.IOException;
 @EnableWebSocketMessageBroker
 public class JmsConfig implements WebSocketMessageBrokerConfigurer{
 	
-	private final String uri = "tcp://127.0.0.1:61616";
-	
-	/*@Bean
-	public BrokerService brokerService()
-	{
-		BrokerService bs = new BrokerService();
-		bs.setBrokerName("webBroker");
-		bs.setPersistent(true);
-		bs.setDataDirectory("target/activemq-data");
-		TransportConnector connector = new TransportConnector();
-		try{
-			connector.setUri(new URI("tcp://0.0.0.0:61616"));
-			bs.addConnector(connector);
-		}
-		catch(URISyntaxException ex)
-		{
-			ex.printStackTrace(System.err);
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace(System.err);
-		}
-		
-		
-		return bs;
-	}
-	@Bean
-	public BrokerService brokerService() {
-		BrokerService bs = new BrokerService();
-		bs.setBrokerName("webBroker");
-		bs.setPersistent(true);
+	private final static String URI = "tcp://127.0.0.1:61616";
 
-		KahaDBPersistenceAdapter kahaDBPersistenceAdapter = new KahaDBPersistenceAdapter();
-		kahaDBPersistenceAdapter.setDirectory(new File("target/kahadb-data"));
-		try{
-			bs.setPersistenceAdapter(kahaDBPersistenceAdapter);
-		}
-		catch (IOException ex) {
-			ex.printStackTrace(System.err);
-		}
-
-		
-
-		TransportConnector connector = new TransportConnector();
-		try {
-			connector.setUri(new URI(uri));
-			bs.addConnector(connector);
-		} catch (URISyntaxException ex) {
-			ex.printStackTrace(System.err);
-		} catch (Exception ex) {
-			ex.printStackTrace(System.err);
-		}
-
-		return bs;
-	} 
-	
-	@Bean
-	public ConnectionFactory connectionFactory()
-	{
-		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-		connectionFactory.setBrokerURL(uri);
-		return connectionFactory;
-	}
-	@Bean
-	public JmsTemplate jmsTemplate()
-	{
-		JmsTemplate jms = new JmsTemplate();
-		jms.setConnectionFactory(connectionFactory());
-		return jms;
-	}
-	*/
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry)
 	{
 		registry.setApplicationDestinationPrefixes("/gleamy");
-		registry.enableSimpleBroker("/topic", "/queue");
-		//registry.configureBrokerChannel().brokerService(brokerService());
+		registry.enableSimpleBroker("/topics", "/queues");
 	}
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry)
 	{
 		registry.addEndpoint("/websocket").setAllowedOrigins("*");
 	}
-	/*
-	@Override 
-	public void configureClientInboundChannel(ChannelRegistration registration)
-	{
-		registration.interceptors(new WebSocketInterceptor());
-	}
-	*/
 }

@@ -1,5 +1,7 @@
 package mikhail.shell.gleamy.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import java.lang.Exception;
 import org.springframework.jms.annotation.JmsListener;
@@ -7,23 +9,24 @@ import mikhail.shell.gleamy.models.Message;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 
 @Controller
-public class TestController
+class TestController
 {
+	private final static Logger LOGGER = LoggerFactory.getLogger(TestController.class);
 	@SubscribeMapping("/topic/users/1")
-	public void reactToSubscription()
+	void reactToSubscription()
 	{
-		System.out.println("Hopefully subscribed");
+		LOGGER.info("Hopefully subscribed");
 	}
 	@JmsListener(destination = "/topic/users/1")
-	public void testMessage(Message message)
+	void testMessage(Message message)
 	{
 		try
 		{
-			System.out.println(message);
+			LOGGER.info(message.getText());
 		}
 		catch(Exception ex)
 		{
-			System.out.println("Error in handling msg");
+			LOGGER.error("Error getting a message from /topic/users/1");
 			ex.printStackTrace(System.err);
 		}
 	}

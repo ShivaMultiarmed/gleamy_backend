@@ -6,15 +6,17 @@ import java.util.Map;
 import java.util.Set;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Component 
-@Scope("prototype")
 @Data
 @Entity
 @Table(name = "chats")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Chat implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

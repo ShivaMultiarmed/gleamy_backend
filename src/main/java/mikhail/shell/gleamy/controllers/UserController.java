@@ -1,15 +1,9 @@
 package mikhail.shell.gleamy.controllers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import mikhail.shell.gleamy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +13,17 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import mikhail.shell.gleamy.models.User; 
-import mikhail.shell.gleamy.dao.UserDAO;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 
 
 @RestController
 @RequestMapping("/api/v1/users")
 @AllArgsConstructor
+@Slf4j
 public class UserController
 {
 	@Autowired
@@ -33,7 +31,7 @@ public class UserController
 	@Autowired
 	private final UserService userService;
 	@GetMapping("/search")
-	public ResponseEntity<List<User>> searchForUsers(@RequestParam("login") String login)
+	ResponseEntity<List<User>> searchForUsers(@RequestParam("login") String login)
 	{
 		try{
 			List<User> users = userService.getUsersByLogin(login);
@@ -45,7 +43,7 @@ public class UserController
 		}
 	}
 	@GetMapping("/{id}")
-	public ResponseEntity<User> getUser(@PathVariable("id") Long userid)
+	ResponseEntity<User> getUser(@PathVariable("id") Long userid)
 	{
 		if (userid == null)
 			return ResponseEntity.badRequest().build();
@@ -59,7 +57,7 @@ public class UserController
 		}
 	}
 	@PatchMapping("/{id}")
-	public ResponseEntity<User> patchUser(@RequestBody User user)
+	ResponseEntity<User> patchUser(@RequestBody User user)
 	{
 		try{
 			return ResponseEntity.ok(userService.patchUser(user));
@@ -70,7 +68,7 @@ public class UserController
 		}
 	}
 	@PostMapping
-	public ResponseEntity<User> addUser(@RequestBody User user)
+	ResponseEntity<User> addUser(@RequestBody User user)
 	{
 		try
 		{
@@ -82,7 +80,7 @@ public class UserController
 		}
 	}
 	@DeleteMapping("/{id}")
-	public ResponseEntity deleteUser(@PathVariable Long id)
+	ResponseEntity deleteUser(@PathVariable Long id)
 	{
 		if (id == null)
 			return ResponseEntity.badRequest().build();
@@ -95,7 +93,7 @@ public class UserController
 		}
 	}
 	@GetMapping("/bylogin/{login}")
-	public ResponseEntity<User> getUser(@PathVariable String login)
+	ResponseEntity<User> getUser(@PathVariable String login)
 	{
 		try
 		{
@@ -108,14 +106,9 @@ public class UserController
 	}
 
 	@GetMapping(value = "/{id}/avatar", produces = "image/*")
-	public HttpEntity<byte[]> getAvatarById(@PathVariable("id") final long userid,
-											HttpServletResponse response) {
-		if (!usersRepo.existsById(userid))
-			return new ResponseEntity<>(HttpStatusCode.valueOf(404));
-		else
-		{
-			User user = usersRepo.getReferenceById(userid);
-			File avatarFile = new File("src/main/resources/storage/imgs/avatars/" + user.getAvatar());
+	HttpEntity<byte[]> getAvatarById(@PathVariable("id") final Long userid) {
+			File avatarFile = userService.getAvatarByUserId(userid);
+			log.info(avatarFile.getAbsolutePath());
 			try {
 				FileInputStream stream = new FileInputStream(avatarFile);
 				byte[] bytes = stream.readAllBytes();
@@ -127,12 +120,13 @@ public class UserController
 				HttpEntity<byte[]> httpEntity = new HttpEntity<>(bytes, headers);
 				stream.close();
 				return httpEntity;
-			} catch (FileNotFoundException e) {
+			}catch (EntityNotFoundException e){
+				return ResponseEntity.badRequest().build();
+			}catch (FileNotFoundException e) {
 				return new ResponseEntity<>(HttpStatusCode.valueOf(404));
 			} catch (IOException e) {
 				return new ResponseEntity<>(HttpStatusCode.valueOf(503));
 			}
-		}
 	}
 
 }
