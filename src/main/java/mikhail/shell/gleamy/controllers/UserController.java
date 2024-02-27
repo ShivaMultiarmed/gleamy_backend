@@ -3,6 +3,7 @@ package mikhail.shell.gleamy.controllers;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mikhail.shell.gleamy.api.StompWrapper;
 import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import mikhail.shell.gleamy.service.UserService;
@@ -17,7 +18,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -105,8 +108,8 @@ public class UserController
 		}
 	}
 
-	@GetMapping(value = "/{id}/avatar", produces = "image/*")
-	HttpEntity<byte[]> getAvatarById(@PathVariable("id") final Long userid) {
+	@GetMapping(value = "/{id}/avatar")//, produces = "image/*")
+	HttpEntity<StompWrapper> getAvatarById(@PathVariable("id") final Long userid) {
 			File avatarFile = userService.getAvatarByUserId(userid);
 			log.info(avatarFile.getAbsolutePath());
 			try {
@@ -115,9 +118,11 @@ public class UserController
 
 				String type = avatarFile.getName().split("\\.")[1];
 				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Type", "image/" + type);
+				//headers.add("Content-Type", "image/" + type);
 
-				HttpEntity<byte[]> httpEntity = new HttpEntity<>(bytes, headers);
+				Map<String, String> details = new HashMap<>();
+				details.put("filename", avatarFile.getName());
+				HttpEntity<StompWrapper> httpEntity = new HttpEntity<>(new StompWrapper("FETCHEDAVA", bytes, details), headers);
 				stream.close();
 				return httpEntity;
 			}catch (EntityNotFoundException e){

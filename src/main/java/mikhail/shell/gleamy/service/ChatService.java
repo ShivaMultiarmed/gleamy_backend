@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import mikhail.shell.gleamy.repositories.ChatsRepo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +22,7 @@ import java.util.List;
 public final class ChatService
 {
 	@Autowired
-	private final JmsTemplate jmsTpl;
+	private final SimpMessagingTemplate jmsTpl;
 	@Autowired
 	private final ChatsRepo chatsRepo;
 	public List<Chat> getAllChats(Long userid)
@@ -38,9 +39,9 @@ public final class ChatService
 	}
 	private void notifyAllMembers(String command, Chat chat)
 	{
-		//chat.getUsers().forEach(
-		//		user -> jmsTpl.convertAndSend("/topic/users/"+user.getId()+"/chats", new StompWrapper(command,chat))
-		//);
+		chat.getUsers().forEach(
+				user -> jmsTpl.convertAndSend("/topics/users/"+user.getId()+"/chats", new StompWrapper(command,chat))
+		);
 	}
 	public Chat getChat(Long chatid)
 	{

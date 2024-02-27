@@ -5,10 +5,7 @@ import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.service.AuthService;
 import mikhail.shell.gleamy.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -18,7 +15,7 @@ class AuthController {
     private final UserService userService;
     
     @PostMapping("/login")
-    ResponseEntity login(@RequestParam("login")String login,
+    ResponseEntity<User> login(@RequestParam("login")String login,
                                 @RequestParam("password") String password)
     {
         String code = authService.valiateLogin(login, password);
@@ -28,23 +25,21 @@ class AuthController {
             return switch (code)
                     {
                         case "NOTFOUND" -> ResponseEntity.notFound().build();
-                        case "PASSINCORRECT" -> ResponseEntity.badRequest().body(code);
-                        default -> ResponseEntity.badRequest().body(code);
+                        case "PASSINCORRECT" -> ResponseEntity.badRequest().build();
+                        default -> ResponseEntity.badRequest().build();
                     };
     }
     @PostMapping("/signup")
-	ResponseEntity signup (@RequestParam("login")String login,
-            @RequestParam("password") String password,
-            @RequestParam("email") String email)
+	ResponseEntity<User> signup (@RequestBody User user)
     {
-        String code = authService.validateSignup(login, email);
+        String code = authService.validateSignup(user.getLogin(), user.getEmail());
         if (code.equals("OK"))
-            return ResponseEntity.ok(userService.addUser(new User(null,login, password,email,null)));
+            return ResponseEntity.ok(userService.addUser(user));
         else
             return switch (code)
             {
-                case "NAMEEXISTS", "EMAILEXISTS" -> ResponseEntity.badRequest().body(code);
-                default -> ResponseEntity.badRequest().body(code);
+                case "NAMEEXISTS", "EMAILEXISTS" -> ResponseEntity.badRequest().build();
+                default -> ResponseEntity.badRequest().build();
             };
     }
 }

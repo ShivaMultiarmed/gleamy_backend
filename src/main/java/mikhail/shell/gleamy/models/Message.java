@@ -15,11 +15,15 @@ import java.time.LocalDateTime;
 @Table(name = "messages")
 @NoArgsConstructor
 @AllArgsConstructor
+//@SecondaryTable(name = "users", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 public class Message implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long msgid;
     private long chatid, userid;
     private String text;
+    /*@ManyToOne
+    @JoinColumn(table = "users",name = "login")
+    private String login;*/
 	private LocalDateTime datetime;
 }
