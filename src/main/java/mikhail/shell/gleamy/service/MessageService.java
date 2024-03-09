@@ -2,7 +2,7 @@ package mikhail.shell.gleamy.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import mikhail.shell.gleamy.api.StompWrapper;
+import mikhail.shell.gleamy.api.ActionModel;
 import mikhail.shell.gleamy.models.Message;
 import mikhail.shell.gleamy.repositories.MessagesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public final class MessageService {
 		msg = messagesRepo.save(msg);
 		simpJms.convertAndSend(
 				"/topics/chats/" + msg.getChatid(),
-				new StompWrapper("NEWMESSAGE",msg)
+				new ActionModel("NEWMESSAGE",msg)
 		);
 		return msg;
 	}
@@ -45,7 +45,7 @@ public final class MessageService {
 			throw new IllegalArgumentException();
 		simpJms.convertAndSend(
 				"/topics/chats/" + msg.getChatid(),
-				new StompWrapper("EDITMESSAGE", msg)
+				new ActionModel("EDITMESSAGE", msg)
 		);
 		return messagesRepo.save(msg);
 	}
@@ -55,7 +55,7 @@ public final class MessageService {
 			throw new IllegalArgumentException();
 		simpJms.convertAndSend(
 				"/topics/chats/"+msgid,
-				new StompWrapper("DELETEMESSAGE", msgid)
+				new ActionModel("DELETEMESSAGE", msgid)
 		);
 		return !messagesRepo.existsById(msgid);
 	}

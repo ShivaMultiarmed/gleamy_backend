@@ -16,10 +16,9 @@ public class AppConfig {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
         //ds.setUrl("jdbc:mysql://rc1b-kt5nph9yudp43u71.mdb.yandexcloud.net:3306/db1?useSSL=true");
-        ds.setUrl("jdbc:mysql://localhost:3306/gleamy_db?useSSL=true");
-        ds.setUsername("root");
-        //ds.setPassword("BlackWater");
-        ds.setPassword("");
+        ds.setUrl("jdbc:mysql://127.0.0.1:3306/gleamy_db?useSSL=true");
+        ds.setUsername("mikhail_shell");
+        ds.setPassword("BlackWater");
         return ds;
     }
 }

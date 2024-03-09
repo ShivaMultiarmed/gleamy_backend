@@ -1,11 +1,14 @@
 server:
   address: 0.0.0.0
   port: 8080
-  #servlet:
-    #context-path: "/gleamy"
+  servlet:
+    context-path: "/gleamy"
 
 logging:
   level:
     org:
       springframework:
         web: "DEBUG"
+
+gleamy:
+  root: ${GLEAMY_ROOT}

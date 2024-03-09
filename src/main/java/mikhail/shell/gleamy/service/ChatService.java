@@ -4,8 +4,6 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import mikhail.shell.gleamy.repositories.ChatsRepo;
-import org.springframework.context.ApplicationContext;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import mikhail.shell.gleamy.models.Chat;
 import mikhail.shell.gleamy.models.User;
 
-import mikhail.shell.gleamy.api.StompWrapper;
+import mikhail.shell.gleamy.api.ActionModel;
 
 import java.util.List;
 
@@ -40,7 +38,7 @@ public final class ChatService
 	private void notifyAllMembers(String command, Chat chat)
 	{
 		chat.getUsers().forEach(
-				user -> jmsTpl.convertAndSend("/topics/users/"+user.getId()+"/chats", new StompWrapper(command,chat))
+				user -> jmsTpl.convertAndSend("/topics/users/"+user.getId()+"/chats", new ActionModel(command,chat))
 		);
 	}
 	public Chat getChat(Long chatid)

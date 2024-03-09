@@ -3,7 +3,7 @@ package mikhail.shell.gleamy.controllers;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mikhail.shell.gleamy.api.StompWrapper;
+import mikhail.shell.gleamy.api.ActionModel;
 import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import mikhail.shell.gleamy.service.UserService;
@@ -109,7 +109,7 @@ public class UserController
 	}
 
 	@GetMapping(value = "/{id}/avatar")//, produces = "image/*")
-	HttpEntity<StompWrapper> getAvatarById(@PathVariable("id") final Long userid) {
+	HttpEntity<ActionModel> getAvatarById(@PathVariable("id") final Long userid) {
 			File avatarFile = userService.getAvatarByUserId(userid);
 			log.info(avatarFile.getAbsolutePath());
 			try {
@@ -122,7 +122,7 @@ public class UserController
 
 				Map<String, String> details = new HashMap<>();
 				details.put("filename", avatarFile.getName());
-				HttpEntity<StompWrapper> httpEntity = new HttpEntity<>(new StompWrapper("FETCHEDAVA", bytes, details), headers);
+				HttpEntity<ActionModel> httpEntity = new HttpEntity<>(new ActionModel("FETCHEDAVA", bytes, details), headers);
 				stream.close();
 				return httpEntity;
 			}catch (EntityNotFoundException e){
