@@ -8,11 +8,9 @@ import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import mikhail.shell.gleamy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -109,7 +107,7 @@ public class UserController
 	}
 
 	@GetMapping(value = "/{id}/avatar")//, produces = "image/*")
-	HttpEntity<ActionModel> getAvatarById(@PathVariable("id") final Long userid) {
+	HttpEntity<ActionModel> getAvatarByUserId(@PathVariable("id") final Long userid) {
 			File avatarFile = userService.getAvatarByUserId(userid);
 			log.info(avatarFile.getAbsolutePath());
 			try {
@@ -131,6 +129,31 @@ public class UserController
 				return new ResponseEntity<>(HttpStatusCode.valueOf(404));
 			} catch (IOException e) {
 				return new ResponseEntity<>(HttpStatusCode.valueOf(503));
+			}
+	}
+	@PatchMapping("/{userid}/avatar")
+	ResponseEntity<Map<String, Object>> editAvatarByUserId(@PathVariable Long userid, @RequestParam("avatar") MultipartFile avatar)
+	{
+		if (userid == null)
+			return ResponseEntity.badRequest().build();
+		else
+			try {
+				String filename = userService.editAvatarByUserId(userid, avatar);
+				Map<String, Object> fileDetails = new HashMap<>();
+				fileDetails.put("filename", filename);
+				return new ResponseEntity<>(fileDetails, HttpStatus.OK);
+			}
+			catch (IllegalArgumentException e)
+			{
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			catch (EntityNotFoundException e)
+			{
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			catch(IOException e)
+			{
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}
 
