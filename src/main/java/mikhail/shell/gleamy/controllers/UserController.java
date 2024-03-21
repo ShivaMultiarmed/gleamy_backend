@@ -156,5 +156,20 @@ public class UserController
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 	}
-
+	@DeleteMapping("/{userid}/avatar")
+	ResponseEntity<Map<String, Object>> deleteAvatarByUserId(@PathVariable Long userid){
+		if (userid == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else{
+			try
+			{
+				Map<String, Object> result = new HashMap<>();
+				result.put("result", userService.deleteAvatarByUserId(userid));
+				return new ResponseEntity<>(result, HttpStatus.OK);
+			}catch(IllegalArgumentException e)
+			{
+				return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+			}
+		}
+	}
 }

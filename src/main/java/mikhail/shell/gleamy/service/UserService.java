@@ -86,6 +86,11 @@ public class UserService {
             Files.copy(avatar.getInputStream(), targetPath);
 
             User user = usersRepo.findById(userid).get();
+            if (user.getAvatar() != null)
+            {
+                File file = new File(uploadPath.toString()+user.getAvatar());
+                file.delete();
+            }
             user.setAvatar(filename);
             usersRepo.save(user);
 
@@ -100,4 +105,26 @@ public class UserService {
         else
             throw new IllegalArgumentException();
     }
+    public boolean deleteAvatarByUserId(long userid)
+    {
+        if (!usersRepo.existsById(userid))
+            throw new EntityNotFoundException();
+        else {
+            User user = usersRepo.findById(userid).get();
+            if (user.getAvatar() == null)
+                throw new IllegalArgumentException();
+            else
+            {
+                File avatarFile = new File(GLEAMY_ROOT + AVATAR_PATH + user.getAvatar());
+                boolean isFileDeleted = avatarFile.delete();
+
+                user.setAvatar(null);
+                usersRepo.save(user);
+                user = usersRepo.findById(userid).get();
+
+                return isFileDeleted && user.getAvatar() == null;
+            }
+        }
+    }
+
 }
