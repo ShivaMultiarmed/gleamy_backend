@@ -174,8 +174,11 @@ public class UserController
 			}
 		}
 	}
-	@GetMapping("/{userid}/media/images/portions/{portion_num}")
-	ResponseEntity<List<Media>> getImagesPortionByNumber(@PathVariable Long userid, @PathVariable Long portion_num)
+	@GetMapping("/{userid}/media")
+	ResponseEntity<List<Media>> getImagesPortionByNumber(
+			@PathVariable Long userid,
+			@RequestParam("portion_num") Long portion_num,
+			@RequestParam("type") Media.Type type)
 	{
 		if (userid == null || portion_num == null)
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

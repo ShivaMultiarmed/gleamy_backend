@@ -1,9 +1,6 @@
 package mikhail.shell.gleamy.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +20,10 @@ public class Media {
     @Id
     @UuidGenerator
     private String uuid;
-    private String type, extension;
+    private Type type;
+    private String extension;
     private Long userid;
     @CreationTimestamp
     private LocalDateTime date_time;
+    public enum Type { IMAGE, AUDIO, VIDEO }
 }

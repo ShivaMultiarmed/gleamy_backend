@@ -83,7 +83,7 @@ public class UserService {
         final long begin = (portion_num - 1) * portion;
         if (!usersRepo.existsById(userid))
             throw new EntityNotFoundException();
-        return mediaRepository.getMediaPortionByUserId(userid,"image",begin, portion);
+        return mediaRepository.getMediaPortionByUserId(userid,Media.Type.IMAGE,begin, portion);
     }
     public File getImageById(String uuid) throws EntityNotFoundException
     {
