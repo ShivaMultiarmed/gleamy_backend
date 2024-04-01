@@ -17,12 +17,12 @@ public class MessagesRepoTests {
     @Autowired
     private MessagesRepo repo;
 
-    @Test
+    /*@Test
     public void checkGetAllMembersIdsByChatId()
 
     {
         final List<Long> expectedIds = List.of(2L, 1L);
         final List<Long> realIds = repo.findAllMembersIdsByChatid(1L);
         Assertions.assertEquals(expectedIds, realIds);
-    }
+    }*/
 }

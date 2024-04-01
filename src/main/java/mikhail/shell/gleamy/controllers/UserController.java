@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mikhail.shell.gleamy.api.ActionModel;
+import mikhail.shell.gleamy.models.Media;
 import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import mikhail.shell.gleamy.service.UserService;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -171,5 +173,41 @@ public class UserController
 				return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 			}
 		}
+	}
+	@GetMapping("/{userid}/media/images/portions/{portion_num}")
+	ResponseEntity<List<Media>> getImagesPortionByNumber(@PathVariable Long userid, @PathVariable Long portion_num)
+	{
+		if (userid == null || portion_num == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		try{
+			List<Media> mediaList = userService.getImagesPortionByUserId(userid, portion_num);
+			return new ResponseEntity<>(mediaList, HttpStatus.OK);
+		}catch (EntityNotFoundException e)
+		{
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	@GetMapping("/media/images")
+	ResponseEntity<byte[]> getUserImageById(@RequestParam String uuid)
+	{
+		if (uuid == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else
+			try{
+				File file = userService.getImageById(uuid);
+				FileInputStream stream = new FileInputStream(file);
+				byte[] bytes = stream.readAllBytes();
+				stream.close();
+
+				ActionModel<byte[]> actionModel = new ActionModel<>("DISPLAY_IMAGE",bytes);
+				return new ResponseEntity<>(bytes, HttpStatus.OK);
+			}catch(EntityNotFoundException | FileNotFoundException e)
+			{
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			catch (IOException e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
 	}
 }

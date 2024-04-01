@@ -3,7 +3,9 @@ package mikhail.shell.gleamy.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import mikhail.shell.gleamy.models.Media;
 import mikhail.shell.gleamy.models.User;
+import mikhail.shell.gleamy.repositories.MediaRepository;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +27,11 @@ import java.util.UUID;
 public class UserService {
     @Value("${gleamy.root}")
     private String GLEAMY_ROOT;
-    private final static String AVATAR_PATH = "/storage/imgs/avatars/";
+    private final static String AVATAR_PATH = "/storage/imgs/avatars/", IMAGES_PATH = "/storage/imgs/lists/";
     @Autowired
     private final UsersRepo usersRepo;
+    @Autowired
+    private final MediaRepository mediaRepository;
     public User getUserById(Long userid) throws IllegalArgumentException {
         return usersRepo.findById(userid).orElseThrow(IllegalArgumentException::new);
     }
@@ -73,6 +77,19 @@ public class UserService {
             throw new EntityNotFoundException();
         return new File(GLEAMY_ROOT+AVATAR_PATH + usersRepo.getReferenceById(userid).getAvatar());
     }
+    public List<Media> getImagesPortionByUserId(Long userid, Long portion_num)
+    {
+        final int portion = 12;
+        final long begin = (portion_num - 1) * portion;
+        if (!usersRepo.existsById(userid))
+            throw new EntityNotFoundException();
+        return mediaRepository.getMediaPortionByUserId(userid,"image",begin, portion);
+    }
+    public File getImageById(String uuid) throws EntityNotFoundException
+    {
+        Media media = mediaRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+        return new File(GLEAMY_ROOT + IMAGES_PATH + media.getUuid() + "." + media.getExtension());
+    }
     public String editAvatarByUserId(Long userid, MultipartFile avatar) throws IOException, IllegalArgumentException
     {
         if (!usersRepo.existsById(userid))
@@ -87,10 +104,7 @@ public class UserService {
 
             User user = usersRepo.findById(userid).get();
             if (user.getAvatar() != null)
-            {
-                File file = new File(uploadPath.toString()+user.getAvatar());
-                file.delete();
-            }
+                deleteAvatarFileByUserId(user);
             user.setAvatar(filename);
             usersRepo.save(user);
 
@@ -115,8 +129,7 @@ public class UserService {
                 throw new IllegalArgumentException();
             else
             {
-                File avatarFile = new File(GLEAMY_ROOT + AVATAR_PATH + user.getAvatar());
-                boolean isFileDeleted = avatarFile.delete();
+                boolean isFileDeleted = deleteAvatarFileByUserId(user);
 
                 user.setAvatar(null);
                 usersRepo.save(user);
@@ -125,6 +138,10 @@ public class UserService {
                 return isFileDeleted && user.getAvatar() == null;
             }
         }
+    }
+    private boolean deleteAvatarFileByUserId(User user)
+    {
+        return new File(GLEAMY_ROOT + AVATAR_PATH + user.getAvatar()).delete();
     }
 
 }
