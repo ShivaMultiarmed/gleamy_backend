@@ -1,7 +1,6 @@
 package mikhail.shell.gleamy.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import mikhail.shell.gleamy.models.Media;
 import mikhail.shell.gleamy.models.User;
@@ -9,11 +8,9 @@ import mikhail.shell.gleamy.repositories.MediaRepository;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,7 +82,7 @@ public class UserService {
             throw new EntityNotFoundException();
         return mediaRepository.getMediaPortionByUserId(userid,Media.Type.IMAGE,begin, portion);
     }
-    public File getImageById(String uuid) throws EntityNotFoundException
+    public File getMediaById(String uuid) throws EntityNotFoundException
     {
         Media media = mediaRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
         return new File(GLEAMY_ROOT + IMAGES_PATH + media.getUuid() + "." + media.getExtension());

@@ -1,14 +1,13 @@
 package mikhail.shell.gleamy.models;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,6 +19,7 @@ public class Media {
     @Id
     @UuidGenerator
     private String uuid;
+    @Enumerated(EnumType.STRING)
     private Type type;
     private String extension;
     private Long userid;

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 @RestController
@@ -175,7 +174,7 @@ public class UserController
 		}
 	}
 	@GetMapping("/{userid}/media")
-	ResponseEntity<List<Media>> getImagesPortionByNumber(
+	ResponseEntity<List<Media>> getMediaPortionByNumber(
 			@PathVariable Long userid,
 			@RequestParam("portion_num") Long portion_num,
 			@RequestParam("type") Media.Type type)
@@ -190,20 +189,26 @@ public class UserController
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	@GetMapping("/media/images")
-	ResponseEntity<byte[]> getUserImageById(@RequestParam String uuid)
+	@GetMapping(path = "/media", produces = "image/*")
+	ResponseEntity<byte[]> getUserMediaById(@RequestParam String uuid)
 	{
 		if (uuid == null)
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		else
 			try{
-				File file = userService.getImageById(uuid);
+				File file = userService.getMediaById(uuid);
 				FileInputStream stream = new FileInputStream(file);
 				byte[] bytes = stream.readAllBytes();
 				stream.close();
 
-				ActionModel<byte[]> actionModel = new ActionModel<>("DISPLAY_IMAGE",bytes);
-				return new ResponseEntity<>(bytes, HttpStatus.OK);
+				HttpHeaders headers = new HttpHeaders();
+				String mime = mimeFromFile(file.getName());
+				headers.setContentType(MediaType.valueOf(mime));
+
+				return ResponseEntity
+						.ok()
+						.headers(headers)
+						.body(bytes);
 			}catch(EntityNotFoundException | FileNotFoundException e)
 			{
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -212,5 +217,23 @@ public class UserController
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
+	}
+	private static String mimeFromFile(String filename)
+	{
+		final String extension = getFileExtension(filename);
+
+		final Map<String, String> mimeTypes = new HashMap<>();
+		mimeTypes.put("jpg", "image/jpg");
+		mimeTypes.put("png", "image/png");
+		mimeTypes.put("jfif", "image/jfif");
+
+		return mimeTypes.getOrDefault(extension, null);
+	}
+	private static String getFileExtension(String fileName) {
+		int dotIndex = fileName.lastIndexOf('.');
+		if (dotIndex == -1 || dotIndex == fileName.length() - 1)
+			return null;
+		else
+			return fileName.substring(dotIndex + 1);
 	}
 }
