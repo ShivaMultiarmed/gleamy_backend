@@ -117,7 +117,7 @@ public class UserService {
         else
             throw new IllegalArgumentException();
     }
-    public boolean deleteAvatarByUserId(long userid)
+    public boolean deleteAvatarByUserId(final long userid)
     {
         if (!usersRepo.existsById(userid))
             throw new EntityNotFoundException();
@@ -143,8 +143,9 @@ public class UserService {
     }
     public Media postMedia(Media media, MultipartFile file)
     {
-        String fileName = uploadFile(media, file);
-        return (fileName == null) ? null : insertMedia(media);
+        final String uuid = uploadFile(media, file);
+        media.setUuid(uuid);
+        return (uuid == null) ? null : insertMedia(media);
     }
     private String uploadFile(Media media, MultipartFile file)
     {
@@ -156,11 +157,12 @@ public class UserService {
                 };
         Path uploadPath = Paths.get(GLEAMY_ROOT + path);
         String filetype = media.getExtension();
-        String filename = UUID.randomUUID().toString() + "." + filetype;
+        String uuid = UUID.randomUUID().toString();
+        String filename = uuid + "." + filetype;
         Path targetPath = uploadPath.resolve(filename);
         try {
             Files.copy(file.getInputStream(), targetPath);
-            return filename;
+            return uuid;
         } catch (IOException e) {
             return null;
         }
