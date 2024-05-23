@@ -161,13 +161,11 @@ public class UserService {
                     case VIDEO -> VIDEOS_PATH;
                 };
         Path uploadPath = Paths.get(GLEAMY_ROOT + path);
-        String filetype = media.getExtension();
-        String uuid = UUID.randomUUID().toString();
-        String filename = uuid + "." + filetype;
+        String filename = media.getUuid() + "." + media.getExtension();
         Path targetPath = uploadPath.resolve(filename);
         try {
             Files.copy(file.getInputStream(), targetPath);
-            return uuid;
+            return filename;
         } catch (IOException e) {
             return null;
         }
