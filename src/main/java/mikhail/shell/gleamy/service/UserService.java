@@ -143,9 +143,14 @@ public class UserService {
     }
     public Media postMedia(Media media, MultipartFile file)
     {
-        final String uuid = uploadFile(media, file);
-        media.setUuid(uuid);
-        return (uuid == null) ? null : insertMedia(media);
+        media = insertMedia(media);
+        if (media.getUuid() == null)
+            return null;
+        else
+        {
+            uploadFile(media, file);
+            return media;
+        }
     }
     private String uploadFile(Media media, MultipartFile file)
     {
