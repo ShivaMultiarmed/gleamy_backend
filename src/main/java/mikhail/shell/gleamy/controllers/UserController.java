@@ -236,4 +236,14 @@ public class UserController
 		else
 			return fileName.substring(dotIndex + 1);
 	}
+	@PostMapping(path = "/media/post")
+	ResponseEntity<Media> postMedia(@RequestPart("media") Media media, @RequestPart("file") MultipartFile file)
+	{
+		if (media == null || file == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else
+		{
+			return new ResponseEntity<>(userService.postMedia(media, file), HttpStatus.OK);
+		}
+	}
 }

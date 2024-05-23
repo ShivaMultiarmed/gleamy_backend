@@ -24,7 +24,8 @@ import java.util.UUID;
 public class UserService {
     @Value("${gleamy.root}")
     private String GLEAMY_ROOT;
-    private final static String AVATAR_PATH = "/storage/imgs/avatars/", IMAGES_PATH = "/storage/imgs/lists/";
+    private final static String AVATAR_PATH = "/storage/imgs/avatars/", IMAGES_PATH = "/storage/imgs/lists/",
+            AUDIOS_PATH = "/storage/audios/lists/", VIDEOS_PATH = "/storage/videos/lists/";
     @Autowired
     private final UsersRepo usersRepo;
     @Autowired
@@ -140,5 +141,32 @@ public class UserService {
     {
         return new File(GLEAMY_ROOT + AVATAR_PATH + user.getAvatar()).delete();
     }
-
+    public Media postMedia(Media media, MultipartFile file)
+    {
+        String fileName = uploadFile(media, file);
+        return (fileName == null) ? null : insertMedia(media);
+    }
+    private String uploadFile(Media media, MultipartFile file)
+    {
+        String path = switch (media.getType())
+                {
+                    case IMAGE -> IMAGES_PATH;
+                    case AUDIO -> AUDIOS_PATH;
+                    case VIDEO -> VIDEOS_PATH;
+                };
+        Path uploadPath = Paths.get(GLEAMY_ROOT + path);
+        String filetype = media.getExtension();
+        String filename = UUID.randomUUID().toString() + "." + filetype;
+        Path targetPath = uploadPath.resolve(filename);
+        try {
+            Files.copy(file.getInputStream(), targetPath);
+            return filename;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+    private Media insertMedia(Media media)
+    {
+        return mediaRepository.save(media);
+    }
 }
