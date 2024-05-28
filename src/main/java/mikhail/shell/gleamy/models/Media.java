@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Media {
-    @Id
-    @UuidGenerator
+    @Id @UuidGenerator
     private String uuid;
     @Enumerated(EnumType.STRING)
     private Type type;

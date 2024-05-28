@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface MediaRepository extends JpaRepository<Media, String> {
-    @Query(value = "SELECT * FROM `media` WHERE `userid` = :userid AND `type` = :#{#type.name()} ORDER BY `date_time` LIMIT :begin, :portion", nativeQuery = true)
+    @Query(value = "SELECT * FROM `media` WHERE `userid` = :userid AND `type` = :#{#type.name()} ORDER BY `date_time` DESC LIMIT :begin, :portion", nativeQuery = true)
     List<Media> getMediaPortionByUserId(@Param("userid") Long userid,@Param("type") Media.Type type,@Param("begin") Long begin,@Param("portion") Integer portion);
 }
