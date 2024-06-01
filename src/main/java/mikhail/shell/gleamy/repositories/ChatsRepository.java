@@ -9,10 +9,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 @Repository
-public interface ChatsRepo extends JpaRepository<Chat, Long> {
+public interface ChatsRepository extends JpaRepository<Chat, Long> {
     @Modifying
     @Query(nativeQuery = true,
             value = "SELECT `chats`.* FROM `chats` INNER JOIN `users_in_chats`" +
-                    " ON `chats`.`id` = `users_in_chats`.`chatid` WHERE `users_in_chats`.`userid` = :userid ;")
+                    " ON `chats`.`id` = `users_in_chats`.`chatid` WHERE `users_in_chats`.`userid` = :userid" +
+                    " ORDER BY `chats`.`datetime` DESC;")
     List<Chat> getUserChats(@Param("userid") Long userid);
 }

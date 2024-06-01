@@ -1,6 +1,7 @@
 package mikhail.shell.gleamy.models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class Chat implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String title;
     @Transient
 	private Message last;
@@ -31,4 +33,6 @@ public class Chat implements Serializable{
             inverseJoinColumns = @JoinColumn(name="userid")
     )
     private Set<User> users;
+    @CreationTimestamp
+    private LocalDateTime datetime;
 }

@@ -2,11 +2,10 @@ package mikhail.shell.gleamy.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import mikhail.shell.gleamy.models.Message;
-import mikhail.shell.gleamy.repositories.ChatsRepo;
-import mikhail.shell.gleamy.repositories.MessagesRepo;
+import mikhail.shell.gleamy.repositories.ChatsRepository;
+import mikhail.shell.gleamy.repositories.MessagesRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import mikhail.shell.gleamy.api.ActionModel;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +25,11 @@ public final class ChatService
 	@Autowired
 	private final SimpMessagingTemplate jmsTpl;
 	@Autowired
-	private final ChatsRepo chatsRepo;
-	private final MessagesRepo messageRepo;
+	private final ChatsRepository chatsRepository;
+	private final MessagesRepository messageRepo;
 	public List<Chat> getAllChats(Long userid)
 	{
-		List<Chat> chatList = chatsRepo.getUserChats(userid);
+		List<Chat> chatList = chatsRepository.getUserChats(userid);
 		populateChatsWithLastMessages(chatList);
 		sortChats(chatList);
 		return chatList;
@@ -47,26 +45,18 @@ public final class ChatService
 	}
 	private void sortChats(List<Chat> chatList)
 	{
-		//List<Chat> notEmptyChats = chatList.stream().filter(chat -> chat.getLast() != null).toList();
 		chatList.sort((chat1, chat2) -> {
-			Message msg1 = chat1.getLast(), msg2 = chat2.getLast();
-			if (msg1 == null && msg2 == null)
-				return 0;
-			else if (msg1 == null)
-				return 1;
-			else if (msg2 == null)
-				return -1;
-			else{
-				LocalDateTime dt1 = msg1.getDatetime(), dt2 = msg2.getDatetime();
-				return dt1 != null && dt2 != null ? dt2.compareTo(dt1) : 0;
-			}
+			final Message msg1 = chat1.getLast(), msg2 = chat2.getLast();
+			final LocalDateTime dt1 = (msg1 != null) ? msg1.getDatetime() : chat1.getDatetime();
+			final LocalDateTime dt2 = (msg2 != null) ? msg2.getDatetime() : chat2.getDatetime();
+			return dt2.compareTo(dt1);
 		});
 	}
 	public Chat addChat(Chat chat) throws EntityExistsException
 	{
-		if(chatsRepo.existsById(chat.getId()))
+		if(chatsRepository.existsById(chat.getId()))
 			throw new EntityExistsException();
-		chat = chatsRepo.save(chat);
+		chat = chatsRepository.save(chat);
 		notifyAllMembers("NEWCHAT",chat);
 		return chat;
 	}
@@ -78,7 +68,7 @@ public final class ChatService
 	}
 	public Chat getChat(Long chatid)
 	{
-		return chatsRepo.findById(chatid).orElse(null);
+		return chatsRepository.findById(chatid).orElse(null);
 	}
 	public List<User> getAllChatMembers(Long chatid) throws IllegalArgumentException
 	{
@@ -86,17 +76,17 @@ public final class ChatService
 	}
 	public Chat editChat(Chat chat) throws EntityNotFoundException
 	{
-		if (!chatsRepo.existsById(chat.getId()))
+		if (!chatsRepository.existsById(chat.getId()))
 			throw new EntityNotFoundException();
-		chat = chatsRepo.save(chat);
+		chat = chatsRepository.save(chat);
 		notifyAllMembers("EDITCHAT", chat);
 		return chat;
 	}
 	public Boolean removeChat(Long chatid) throws EntityNotFoundException
 	{
-		if (!chatsRepo.existsById(chatid))
+		if (!chatsRepository.existsById(chatid))
 			throw new EntityNotFoundException();
-		chatsRepo.deleteById(chatid);
-		return !chatsRepo.existsById(chatid);
+		chatsRepository.deleteById(chatid);
+		return !chatsRepository.existsById(chatid);
 	}
 }
