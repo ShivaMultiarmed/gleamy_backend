@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mikhail.shell.gleamy.api.ActionModel;
 import mikhail.shell.gleamy.models.Media;
+import mikhail.shell.gleamy.models.Media.Type;
 import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.UsersRepo;
 import mikhail.shell.gleamy.service.UserService;
@@ -20,6 +21,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 
 @RestController
@@ -142,7 +146,7 @@ public class UserController
 				String filename = userService.editAvatarByUserId(userid, avatar);
 				Map<String, Object> fileDetails = new HashMap<>();
 				fileDetails.put("filename", filename);
-				return new ResponseEntity<>(fileDetails, HttpStatus.OK);
+				return new ResponseEntity<>(fileDetails, OK);
 			}
 			catch (IllegalArgumentException e)
 			{
@@ -166,7 +170,7 @@ public class UserController
 			{
 				Map<String, Object> result = new HashMap<>();
 				result.put("result", userService.deleteAvatarByUserId(userid));
-				return new ResponseEntity<>(result, HttpStatus.OK);
+				return new ResponseEntity<>(result, OK);
 			}catch(IllegalArgumentException e)
 			{
 				return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -177,13 +181,13 @@ public class UserController
 	ResponseEntity<List<Media>> getMediaPortionByNumber(
 			@PathVariable Long userid,
 			@RequestParam("portion_num") Long portion_num,
-			@RequestParam("type") Media.Type type)
+			@RequestParam("type") Type type)
 	{
 		if (userid == null || portion_num == null)
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		try{
 			List<Media> mediaList = userService.getImagesPortionByUserId(userid, portion_num);
-			return new ResponseEntity<>(mediaList, HttpStatus.OK);
+			return new ResponseEntity<>(mediaList, OK);
 		}catch (EntityNotFoundException e)
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -243,7 +247,13 @@ public class UserController
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		else
 		{
-			return new ResponseEntity<>(userService.postMedia(media, file), HttpStatus.OK);
+			return new ResponseEntity<>(userService.postMedia(media, file), OK);
 		}
+	}
+	@GetMapping("/{userid}/media/quantity")
+	ResponseEntity<Long> getMediaQuantity(@PathVariable Long userid, @RequestParam("type") Type type)
+	{
+		final Long mediaQuantity = userService.getMediaQuantity(userid, type);
+		return mediaQuantity != null ? new ResponseEntity<>(mediaQuantity, OK) : new ResponseEntity<>(NOT_FOUND);
 	}
 }

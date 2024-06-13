@@ -3,6 +3,7 @@ package mikhail.shell.gleamy.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import mikhail.shell.gleamy.models.Media;
+import mikhail.shell.gleamy.models.Media.Type;
 import mikhail.shell.gleamy.models.User;
 import mikhail.shell.gleamy.repositories.MediaRepository;
 import mikhail.shell.gleamy.repositories.UsersRepo;
@@ -81,7 +82,7 @@ public class UserService {
         final long begin = (portion_num - 1) * portion;
         if (!usersRepo.existsById(userid))
             throw new EntityNotFoundException();
-        return mediaRepository.getMediaPortionByUserId(userid,Media.Type.IMAGE,begin, portion);
+        return mediaRepository.getMediaPortionByUserId(userid, Type.IMAGE,begin, portion);
     }
     public File getMediaById(String uuid) throws EntityNotFoundException
     {
@@ -173,5 +174,9 @@ public class UserService {
     private Media insertMedia(Media media)
     {
         return mediaRepository.save(media);
+    }
+    public Long getMediaQuantity(Long userid, Type type)
+    {
+        return usersRepo.existsById(userid) ? mediaRepository.getMediaQuantity(userid, type) : null;
     }
 }
